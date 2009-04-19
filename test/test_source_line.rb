@@ -82,6 +82,8 @@ class SourceLineTest < Test::Unit::TestCase
   def test_evaluation_of_constants
     assert_equal %(var VERSION = 1;\n),
       source_line('var VERSION = <%= VERSION.to_i %>;').to_s("VERSION" => "1.0")
+    assert_equal %(var VERSION = \"1\";\n),
+      source_line('var VERSION = <%= VERSION.to_i.to_s.inspect %>;').to_s("VERSION" => "1.0")
   end
   
   def test_interpolation_of_missing_constant_raises_undefined_constant_error
