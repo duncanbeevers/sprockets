@@ -69,11 +69,19 @@ module Sprockets
       def interpolate_constants!(result, constants)
         result.gsub!(/<%=(.*?)%>/) do
           constant = $1.strip
-          if value = constants[constant]
+          if value = interpret_constant(constant, constants)
             value
           else
             raise UndefinedConstantError, "couldn't find constant `#{constant}' in #{inspect}"
           end
+        end
+      end
+      
+      def interpret_constant(constant, constants)
+        chain = constant.split('.')
+        v = constants[chain.shift]
+        chain.inject(v) do |a, method|
+          a.send(method)
         end
       end
       
