@@ -37,7 +37,7 @@ module Sprockets
     end
 
     def require
-      @require ||= (comment || "")[/^=\s+require\s+(\"(.*?)\"|<(.*?)>)\s*$/, 1]
+      @require ||= (comment || "")[/^=\s+require\s+(#{QUOTED}|<(.*?)>)\s*$/, 1]
     end
     
     def require?
@@ -45,7 +45,7 @@ module Sprockets
     end
     
     def provide
-      @provide ||= (comment || "")[/^=\s+provide\s+\"(.*?)\"\s*$/, 1]
+      @provide ||= (comment || "")[/^=\s+provide\s+#{QUOTED}\s*$/, 1]
     end
     
     def provide?
@@ -64,6 +64,8 @@ module Sprockets
     end
     
     protected
+      QUOTED = /(?:\"|\')(.*?)(?:\"|\')/ # non-capturing grouping
+    
       def interpolate_constants!(result, constants)
         result.gsub!(/<%=(.*?)%>/) do
           constant = $1.strip

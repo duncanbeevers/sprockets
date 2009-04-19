@@ -45,6 +45,7 @@ class SourceLineTest < Test::Unit::TestCase
     assert source_line("//= require <foo>").require?
     assert !source_line("//= require<foo>").require?
     assert source_line("//= require \"foo\"").require?
+    assert source_line("//= require \'foo\'").require?
     assert !source_line("//= require <foo> f").require?
   end
   
@@ -57,6 +58,7 @@ class SourceLineTest < Test::Unit::TestCase
 
   def test_line_that_contains_a_provide_comment_should_be_a_provide
     assert source_line("//= provide \"../assets\"").provide?
+    assert source_line("//= provide \'../assets\'").provide?
     assert !source_line("//= provide").provide?
     assert !source_line("//= provide <../assets>").provide?
   end
