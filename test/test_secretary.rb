@@ -113,6 +113,12 @@ class SecretaryTest < Test::Unit::TestCase
       secretary.concatenation.to_s
   end
   
+  def test_secretary_should_initialize_with_yaml
+    secretary = Sprockets::Secretary.new(
+      YAML.load(%Q{root: #{FIXTURES_PATH}\nsource_files:\n  - src/foo.js}))
+    assert_equal content_of_fixture("src/foo.js"), secretary.concatenation.to_s
+  end
+  
   protected
     def paths_relative_to(root, *paths)
       paths.map { |path| File.join(root, path) }

@@ -16,7 +16,10 @@ module Sprockets
     end
 
     def reset!(options = @options)
-      @options = DEFAULT_OPTIONS.merge(options)
+      symbolized_options = options.inject({}) do |a, (k, v)|
+        a.merge(k.to_sym => v)
+      end
+      @options = DEFAULT_OPTIONS.merge(symbolized_options)
       @environment  = Sprockets::Environment.new(@options[:root], [], @options[:constants])
       @preprocessor = Sprockets::Preprocessor.new(@environment, :strip_comments => @options[:strip_comments])
 
