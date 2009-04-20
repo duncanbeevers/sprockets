@@ -46,6 +46,20 @@ class SecretaryTest < Test::Unit::TestCase
     end
   end
   
+  def test_install_assets_with_aliased_destination
+    with_temporary_directory do |temp|
+      temp = File.join(temp, "assets")
+      secretary = Sprockets::Secretary.new(:root => FIXTURES_PATH, :asset_root => temp)
+      secretary.add_source_file("src/script_with_aliased_assets.js")
+
+      assert_equal [], Dir[File.join(temp, "**", "*")]
+      secretary.install_assets
+      assert_equal paths_relative_to(temp, 
+        "stylesheets", "stylesheets/script_with_assets.css"),
+        Dir[File.join(temp, "**", "*")].sort
+    end
+  end
+  
   def test_install_assets_into_nonexistent_directory
     with_temporary_directory do |temp|
       temp = File.join(temp, "assets")

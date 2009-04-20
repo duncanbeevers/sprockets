@@ -57,15 +57,54 @@ class SourceLineTest < Test::Unit::TestCase
   end
 
   def test_line_that_contains_a_provide_comment_should_be_a_provide
-    assert source_line("//= provide \"../assets\"").provide?
-    assert source_line("//= provide \'../assets\'").provide?
-    assert !source_line("//= provide").provide?
-    assert !source_line("//= provide <../assets>").provide?
+    provide = [
+      "//= provide \"../assets\"",
+      "//= provide \'../assets\'",
+      "//= provide <../assets>",
+      "//= provide \"../assets/stylesheets\" as \"stylesheets\"",
+      "//= provide \"../assets/stylesheets\" as \'stylesheets\'"
+    ]
+    do_not_provide = [
+      "//= provide",
+      "//= provide \"../assets\" as ",
+      "//= provide \"../assets\" as <stylesheets>"
+    ]
+    
+    provide.all? do |p|
+      assert source_line(p).provide?
+    end
+    do_not_provide.all? do |p|
+      assert !source_line(p).provide?
+    end
+  end
+  
+  def test_line_that_contains_an_alias_should_be_an_alias
+    aliased = [
+      "//= provide \"../assets/stylesheets\" as \"stylesheets\"",
+      "//= provide \"../assets/stylesheets\" as \'stylesheets\'"
+    ]
+    not_aliased = [
+      "//= provide \"../assets\"",
+      "//= provide \"../assets\" as ",
+      "//= provide \"../assets\" as <stylesheets>"
+    ]
+    
+    aliased.all? do |p|
+      assert source_line(p).alias?
+    end
+    not_aliased.all? do |p|
+      assert !source_line(p).alias?
+    end
   end
   
   def test_provide_should_be_extracted_from_provide_lines
     assert_nil source_line("//= provide").provide
     assert_equal "../assets", source_line("//= provide \"../assets\"").provide
+  end
+  
+  def test_provide_alias_should_be_extracted_from_provide_lines
+    assert_nil source_line("//= provide \"../assets\"").alias
+    assert_equal "stylesheets", source_line("//= provide \"../assets/stylesheets\" as \"stylesheets\"").alias
   end
 
   def test_inspect_should_include_source_file_location_and_line_number

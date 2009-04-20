@@ -54,7 +54,7 @@ module Sprockets
     def install_assets
       if @options[:asset_root]
         preprocessor.asset_paths.each do |asset_path|
-          copy_assets_from(asset_path.absolute_location)
+          copy_assets_from(asset_path)
         end
       end
     end
@@ -81,8 +81,13 @@ module Sprockets
       end
       
       def copy_assets_from(asset_path)
-        relative_file_paths_beneath(asset_path).each do |filename|
-          source, destination = File.join(asset_path, filename), File.join(asset_root, File.dirname(filename))
+        path       = asset_path[0]
+        install_to = asset_path[1] ?
+          File.join(asset_root, asset_path[1]) : asset_root
+        
+        relative_file_paths_beneath(path.absolute_location).each do |filename|
+          source      = File.join(path.absolute_location, filename)
+          destination = File.join(install_to, File.dirname(filename))
           if !File.directory?(source)
             FileUtils.mkdir_p(destination)
             FileUtils.cp(source, destination)

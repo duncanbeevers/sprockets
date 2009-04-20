@@ -45,11 +45,19 @@ module Sprockets
     end
     
     def provide
-      @provide ||= (comment || "")[/^=\s+provide\s+#{QUOTED}\s*$/, 1]
+      @provide ||= (comment || "")[/^=\s+provide\s+#{QUOTED}(?:\sas\s#{QUOTED})?\s*$/, 1]
     end
     
     def provide?
       !!provide
+    end
+    
+    def alias
+      @alias ||= (comment || "")[/^=\s+provide\s+#{QUOTED}\sas\s#{QUOTED}*$/, 2]
+    end
+    
+    def alias?
+      !!self.alias
     end
     
     def inspect
