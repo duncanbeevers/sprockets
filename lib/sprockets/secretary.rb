@@ -5,7 +5,8 @@ module Sprockets
       :load_path      => [],
       :source_files   => [],
       :expand_paths   => true,
-      :strip_comments => true
+      :strip_comments => true,
+      :constants      => {}
     }
 
     attr_reader :environment, :preprocessor
@@ -16,7 +17,7 @@ module Sprockets
 
     def reset!(options = @options)
       @options = DEFAULT_OPTIONS.merge(options)
-      @environment  = Sprockets::Environment.new(@options[:root])
+      @environment  = Sprockets::Environment.new(@options[:root], [], @options[:constants])
       @preprocessor = Sprockets::Preprocessor.new(@environment, :strip_comments => @options[:strip_comments])
 
       add_load_locations(@options[:load_path])

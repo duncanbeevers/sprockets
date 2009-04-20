@@ -2,7 +2,8 @@ module Sprockets
   class Environment
     attr_reader :root, :load_path
     
-    def initialize(root, load_path = [])
+    def initialize(root, load_path = [], constants_from_config = {})
+      @constants_from_config = constants_from_config
       @load_path = [@root = Pathname.new(self, root)]
 
       load_path.reverse_each do |location|
@@ -31,11 +32,20 @@ module Sprockets
     
     def constants(reload = false)
       @constants = nil if reload
-      @constants ||= find_all("constants.yml").inject({}) do |constants, pathname|
+      @constants ||= constants_from_disk(reload).merge(constants_from_config)
+    end
+    
+    def constants_from_disk(reload = false)
+      @constants_from_disk = nil if reload
+      @constants_from_disk ||= find_all("constants.yml").inject({}) do |constants, pathname|
         contents = YAML.load(pathname.contents) rescue nil
         contents = {} unless contents.is_a?(Hash)
         constants.merge(contents)
       end
+    end
+    
+    def constants_from_config
+      @constants_from_config
     end
     
     protected

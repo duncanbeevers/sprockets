@@ -96,6 +96,23 @@ class SecretaryTest < Test::Unit::TestCase
     assert_equal content_of_fixture("src/script_with_comments.js"), secretary.concatenation.to_s
   end
   
+  def test_secretary_provides_constants
+    secretary = Sprockets::Secretary.new(:root => FIXTURES_PATH, :constants => { 'ONE' => '1' })
+    secretary.add_source_file("src/script_with_interpolated_variables.js")
+    assert_equal %Q{var ScriptWithInterpolatedVariables = { key: "1" };\n},
+      secretary.concatenation.to_s
+  end
+  
+  def test_secretary_provided_constants_override_disk_constants
+    secretary = Sprockets::Secretary.new(
+      :root => FIXTURES_PATH,
+      :load_path => [ "src" ],
+      :constants => { 'ONE' => 'forty-two' })
+    secretary.add_source_file("src/script_with_interpolated_variables.js")
+    assert_equal %Q{var ScriptWithInterpolatedVariables = { key: "forty-two" };\n},
+      secretary.concatenation.to_s
+  end
+  
   protected
     def paths_relative_to(root, *paths)
       paths.map { |path| File.join(root, path) }
